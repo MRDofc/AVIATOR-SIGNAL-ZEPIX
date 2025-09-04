@@ -6,8 +6,8 @@
     <title>Zepix Program - Aviator High Odd Signal Analyzer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
+            font-family: 'Orbitron', Arial, sans-serif;
+            background-color: #0a0a0a;
             color: #ffffff;
             margin: 0;
             padding: 0;
@@ -58,37 +58,67 @@
             margin: 30px 0;
         }
         .signal-card {
-            background: linear-gradient(135deg, #1f1f1f, #2a2a2a);
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #1a1a1a, #252525);
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.7);
+            animation: slideIn 0.6s ease-out forwards, glow 1.5s ease-in-out infinite;
             opacity: 0;
             transform: translateY(30px);
-            animation: slideIn 0.6s ease-out forwards;
+            border: 2px solid #00ccff;
+            position: relative;
+            overflow: hidden;
+        }
+        .signal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 204, 255, 0.3), transparent);
+            animation: scan 3s infinite linear;
         }
         .signal-card ul {
             list-style: none;
             padding: 0;
+            font-size: 1.3em;
         }
         .signal-card ul li {
-            padding: 8px 0;
+            padding: 12px 0;
             border-bottom: 1px solid #333;
             animation: fadeInList 0.5s ease-in-out forwards;
             transition: color 0.3s;
+            display: flex;
+            align-items: center;
         }
         .signal-card ul li:last-child {
             border-bottom: none;
         }
         .signal-card ul li:hover {
-            color: #00ff88;
+            color: #00ccff;
         }
         .signal-card h3 {
             margin: 0 0 15px;
             color: #00ff88;
-            font-size: 1.5em;
+            font-size: 1.6em;
             text-align: center;
             text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .time-bold {
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        .percent {
+            color: #00ccff;
+            text-shadow: 0 0 8px #00ccff;
+            animation: pulsePercent 1.8s ease-in-out infinite;
+            margin-left: 5px;
         }
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -100,6 +130,25 @@
         @keyframes fadeInList {
             from { opacity: 0; transform: translateX(-20px); }
             to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px rgba(0, 204, 255, 0.7); }
+            50% { box-shadow: 0 0 25px rgba(0, 204, 255, 1); }
+            100% { box-shadow: 0 0 10px rgba(0, 204, 255, 0.7); }
+        }
+        @keyframes pulse {
+            0% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; }
+            50% { text-shadow: 0 0 15px #00ff88, 0 0 30px #00ff88; }
+            100% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; }
+        }
+        @keyframes pulsePercent {
+            0% { text-shadow: 0 0 8px #00ccff, 0 0 15px #00ccff; }
+            50% { text-shadow: 0 0 12px #00ccff, 0 0 25px #00ccff; }
+            100% { text-shadow: 0 0 8px #00ccff, 0 0 15px #00ccff; }
+        }
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
     </style>
 </head>
@@ -159,10 +208,10 @@
                 card.innerHTML = `
                     <h3>Signal #${signalCount + i + 1}</h3>
                     <ul>
-                        <li>Time: ${signal.time} (Sri Lanka Time)</li>
-                        <li>Recommended Cash Out Odd: ${signal.odd}</li>
-                        <li>Crash Probability Before Odd: ${signal.breakPercent}</li>
-                        <li>Sure Confidence: ${signal.surePercent}</li>
+                        <li>⏰ <span class="time-bold">𝐓𝐈𝐌𝐄</span> = <span class="time-bold">${signal.time}</span></li>
+                        <li>Recommended Cash Out Odd := <span class="percent">${signal.odd}</span></li>
+                        <li>Crash Probability Before Odd := <span class="percent">${signal.breakPercent}</span></li>
+                        <li>Sure Confidence := <span class="percent">${signal.surePercent}</span></li>
                     </ul>
                 `;
                 signalsContainer.appendChild(card);
