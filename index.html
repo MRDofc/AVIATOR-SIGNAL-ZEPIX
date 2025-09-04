@@ -114,11 +114,21 @@
             animation: pulse 1.5s ease-in-out infinite;
             margin-right: 10px;
         }
-        .percent {
-            color: #00ccff;
-            text-shadow: 0 0 8px #00ccff;
-            animation: pulsePercent 1.8s ease-in-out infinite;
-            margin-left: 5px;
+        .trading-animation {
+            width: 150px;
+            height: 50px;
+            margin: 10px auto;
+            background: linear-gradient(90deg, #00ff88, #00ccff, #ff00ff);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .trading-bar {
+            width: 20%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            position: absolute;
+            animation: moveBar 2s linear infinite;
         }
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -141,13 +151,12 @@
             50% { text-shadow: 0 0 15px #00ff88, 0 0 30px #00ff88; }
             100% { text-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88; }
         }
-        @keyframes pulsePercent {
-            0% { text-shadow: 0 0 8px #00ccff, 0 0 15px #00ccff; }
-            50% { text-shadow: 0 0 12px #00ccff, 0 0 25px #00ccff; }
-            100% { text-shadow: 0 0 8px #00ccff, 0 0 15px #00ccff; }
-        }
         @keyframes scan {
             0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        @keyframes moveBar {
+            0% { left: -20%; }
             100% { left: 100%; }
         }
     </style>
@@ -156,41 +165,34 @@
     <header>
         <h1>Zepix Program</h1>
         <p>Aviator High Odd (10+) Signal Analysis Website</p>
-        <p>100% Analyzed based on historical pattern in Sri Lankan time.</p>
+        <p>100% Analyzed based on provided high odd pattern in Sri Lankan time.</p>
     </header>
     <button id="generate-btn">Generate Signals</button>
     <div id="signals-container"></div>
 
     <script>
-        // Historical data from the photo (extracted multipliers)
-        const historicalMultipliers = [
-            2.04, 1.02, 1.47, 9.55, 60.09, 1.37, 1.09,
-            1.03, 1.38, 10.81, 4.78, 2.25, 6.02, 3.06,
-            11.67, 2.67, 5.46, 6.87, 1.68, 2.41, 1.33,
-            1.10, 1.46, 2.60, 1.00, 2.53
-        ];
+        // Intervals in seconds from the provided pattern
+        const intervals = [101, 422, 346, 237, 99, 217];
 
-        // Simple pattern analysis: Calculate average, high odd frequency, etc.
-        const highOdds = historicalMultipliers.filter(m => m >= 10).length;
-        const highOddFreq = (highOdds / historicalMultipliers.length) * 100;
-
-        // Function to get Sri Lankan time (UTC+5:30)
-        function getSLTime(offsetMinutes = 0) {
+        // Function to get Sri Lankan time (UTC+5:30) with seconds
+        function getSLTime(offsetSeconds = 0) {
             const now = new Date();
             const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const slTime = new Date(utc + (3600000 * 5.5) + (offsetMinutes * 60000));
+            const slTime = new Date(utc + (3600000 * 5.5) + (offsetSeconds * 1000));
             const hours = slTime.getHours().toString().padStart(2, '0');
             const minutes = slTime.getMinutes().toString().padStart(2, '0');
-            return `${hours}:${minutes}`;
+            const seconds = slTime.getSeconds().toString().padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
         }
 
-        // Function to generate a single signal based on the detected pattern (every ~5 rounds)
+        // Function to generate a single signal based on the pattern
         function generateSignal(index) {
-            const minOffset = 1 + index * 5; // Based on pattern of highs every 5 rounds
-            const time = getSLTime(minOffset);
-            const breakPercent = '0%'; // 100% analyzed, assuming low crash prob before high
-            const surePercent = '100%'; // 100% analyzed confidence
-            return { time, breakPercent, surePercent };
+            let cumulativeSec = 0;
+            for (let i = 0; i <= index; i++) {
+                cumulativeSec += intervals[i % intervals.length];
+            }
+            const time = getSLTime(cumulativeSec);
+            return { time };
         }
 
         // Button event listener
@@ -208,9 +210,10 @@
                     <h3>Signal #${signalCount + i + 1}</h3>
                     <ul>
                         <li>⏰ <span class="time-bold">𝐓𝐈𝐌𝐄</span> = <span class="time-bold">${signal.time}</span></li>
-                        <li>Crash Probability Before Odd := <span class="percent">${signal.breakPercent}</span></li>
-                        <li>Sure Confidence := <span class="percent">${signal.surePercent}</span></li>
                     </ul>
+                    <div class="trading-animation">
+                        <div class="trading-bar"></div>
+                    </div>
                 `;
                 signalsContainer.appendChild(card);
             }
@@ -218,4 +221,4 @@
         });
     </script>
 </body>
-        </html>
+</html>
